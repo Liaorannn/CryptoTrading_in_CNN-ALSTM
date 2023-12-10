@@ -1,0 +1,3 @@
+2023-12-09 22:20:23,891 CNNALSTM5 [train.py line:79] INFO Using device: cuda
+2023-12-09 22:41:11,434 CNNALSTM5 [train.py line:83] INFO ====================== CNNALSTM5 Train ========================
+2023-12-09 22:41:49,393 CNNALSTM5 [train.py line:15] INFO ---------- Epoch 0 Training ---------

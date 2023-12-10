@@ -1,0 +1,14 @@
+PATH:
+  DATA: /kaggle/input/crypto-trading-data
+  DATASET: /kaggle/input/test-0
+  LOGGER: ./log
+  MODEL: ./model
+MODEL:
+  NAME: CNNALSTM5
+  SEED: 1209
+SEQ_LEN: 60
+TARGET: Target5
+BATCH_SIZE: 512
+EPOCHS: 15
+LR: 1.0e-05
+WEIGHT_DECAY: 0.001
