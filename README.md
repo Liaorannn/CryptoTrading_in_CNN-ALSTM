@@ -1,4 +1,4 @@
-# CryptoTrading_in_Reinforcement_Learning
+# CryptoTrading_in_CNN-ALSTM
 > HKUST MAFM AI_Finance course project.
 
 
