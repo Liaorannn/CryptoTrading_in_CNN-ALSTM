@@ -8,8 +8,35 @@
 from train.init import *
 
 
+class Residual(nn.Module):
+    def __init__(self, input_channels, num_channels,
+                 use_1x1conv=False, strides=1):
+        super().__init__()
+        self.conv1 = nn.Conv2d(input_channels, num_channels,
+                               kernel_size=3, padding=1, stride=strides)
+        self.conv2 = nn.Conv2d(num_channels, num_channels,
+                               kernel_size=3, padding=1)
+        if use_1x1conv:
+            self.conv3 = nn.Conv2d(input_channels, num_channels,
+                                   kernel_size=1, stride=strides)
+        else:
+            self.conv3 = None
+        self.bn1 = nn.BatchNorm2d(num_channels)
+        self.bn2 = nn.BatchNorm2d(num_channels)
+
+    def forward(self, X):
+        # Y = F.relu(self.bn1(self.conv1(X)))
+        # Y = self.bn2(self.conv2(Y))
+        # if self.conv3:
+        #     X = self.conv3(X)
+        # Y += X
+        # return F.relu(Y)
+        ...
+
+
+
 class CNNALSTM(nn.Module):
-    def __init__(self, out_put=2):
+    def __init__(self, out_put=2, use_1x1=False):
         super().__init__()
 
         self.cnn = nn.Sequential(nn.Conv2d(in_channels=1, out_channels=16, kernel_size=(10, 2), dilation=(2, 1)),
@@ -17,7 +44,6 @@ class CNNALSTM(nn.Module):
                                  nn.MaxPool2d((2, 2)),
                                  nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(6, 2)),
                                  nn.LeakyReLU(negative_slope=0.01, inplace=True))
-
         self.lstm = nn.LSTM(input_size=32, hidden_size=64, num_layers=2, batch_first=True)
 
         self.attention = nn.MultiheadAttention(embed_dim=64, num_heads=8, batch_first=True)
@@ -69,6 +95,5 @@ class LSTMModel:
 
     def forward(self, x):
         output, _ = self.lstm(x)
-        output = self.fc_sequence(output[:,-1,:])
+        output = self.fc_sequence(output[:, -1, :])
         return output
-

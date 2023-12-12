@@ -1,8 +1,17 @@
 # CryptoTrading_in_Reinforcement_Learning
 > HKUST MAFM AI_Finance course project.
 
+![img.png](img.png)
+
+### Strategy Design
+***
+
+
+
+
 
 ### Useful Links:
+***
 - [Rainbow DQN](https://paperswithcode.com/method/rainbow-dqn)
 - [Strategy Demo](https://github.com/aifin-hkust/aifin-hkust.github.io/tree/master/2021/project3/demo)
 - [PPO Tricks](https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/)

@@ -146,7 +146,7 @@ class backTest:
                                                      data_cur_min,  # 当前的数据
                                                      self.init_cash,  # 初始金额
                                                      self.commissionRatio,  # 交易费率
-                                                     cash_balance,  # 现金
+                                                     cash_balance,  # 当前现金
                                                      crypto_balance,  # 持仓
                                                      total_balance,  # 总价值
                                                      position_new,  # 当前仓位

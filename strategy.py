@@ -21,7 +21,7 @@ import numpy as np
 from collections import deque, namedtuple
 from train.model import *
 
-model_file = ...  # Model's parameters
+model_file = r'train/results/model_14_0.518.pth'  # Model's parameters
 Volume_step = 5  # position volume step
 
 
@@ -97,7 +97,7 @@ def get_opening_position(siganal_list, mean_vol):
         else:
             position_[idx] = 0.01 * y
 
-    position_ = position_ * mean_vol_ # prevent the influence to market
+    position_ = position_ * mean_vol_  # prevent the influence to market
     for i, p in enumerate(position_):
         position_[i] = round(p, 6)
 
@@ -125,12 +125,20 @@ class Position:
         self.signal.append(signal_)
         self.position.append(position_)
 
-    def update(self, current_tsp, current_position):
+    def update(self, current_tsp, current_position, cash_threshold_=False):
         self.total_position = current_position
 
         # Open new position based on current signal
         _, signal_, position_ = current_tsp  # Current Position changing info
-        self.total_position = self.total_position + position_
+        # Check current cash situation
+        if cash_threshold_:  # May encounter the cash threshold only allowed short trading
+            # if signal_ != 1:
+            #     self.total_position = self.total_position + position_
+            # else:
+            #     self.total_position = self.total_position  # Maintain
+            self.total_position = self.total_position  # Holding still
+        else:  # Open new position
+            self.total_position = self.total_position + position_
 
         # Check length
         if len(self.time) != self.maxlen:
@@ -154,7 +162,7 @@ class Position:
                     self.total_position = self.total_position - self.position[i]
                     self.position[i] = 0.0
 
-        self.append(current_tsp)
+        self.append(current_tsp)  # update
 
         return self.total_position
 
@@ -197,7 +205,7 @@ def handle_bar(counter,  # a counter for number of minute bars that have already
 
         if len(memory.BTC) == 1440:
             model = CNNALSTM()
-            # model.load_state_dict(torch.load(model_file))  # Loading Trained Parameters
+            model.load_state_dict(torch.load(model_file))  # Loading Trained Parameters
 
             btc_x, eth_x, ltc_x, xrp_x = get_train_data(memory)
 
@@ -205,19 +213,23 @@ def handle_bar(counter,  # a counter for number of minute bars that have already
             volume_list = get_volume_mean(memory, step=Volume_step)  # array(vol0, vol1, vol2,...)
             open_position = get_opening_position(signal_list, volume_list)
 
+            if cash_balance < 20000:
+                cash_threshold = True
+            else:
+                cash_threshold = False
             position = np.repeat(0., 4)
-            for id, op in enumerate(open_position):
-                signal_ = get_signal_2(signal_list[id])
-                current_tsp_ = (time, signal_, open_position[id])
+            for id_, op in enumerate(open_position):
+                signal_ = get_signal_2(signal_list[id_])
+                current_tsp_ = (time, signal_, open_position[id_])
 
-                if id == 0:
-                    position[id] = memory.BTC_position.update(current_tsp_, position_current[id])
-                elif id == 1:
-                    position[id] = memory.ETH_position.update(current_tsp_, position_current[id])
-                elif id == 2:
-                    position[id] = memory.LTC_position.update(current_tsp_, position_current[id])
-                elif id == 3:
-                    position[id] = memory.XRP_position.update(current_tsp_, position_current[id])
+                if id_ == 0:
+                    position[id_] = memory.BTC_position.update(current_tsp_, position_current[id_], cash_threshold)
+                elif id_ == 1:
+                    position[id_] = memory.ETH_position.update(current_tsp_, position_current[id_], cash_threshold)
+                elif id_ == 2:
+                    position[id_] = memory.LTC_position.update(current_tsp_, position_current[id_], cash_threshold)
+                elif id_ == 3:
+                    position[id_] = memory.XRP_position.update(current_tsp_, position_current[id_], cash_threshold)
                 else:
                     raise Exception('Wrong idx num!')
 
